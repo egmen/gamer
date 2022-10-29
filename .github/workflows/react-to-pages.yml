@@ -9,9 +9,8 @@ on:
 
 jobs:
   build:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+    env:
+      PUBLIC_URL: https://egmen.github.io/gamer/
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
