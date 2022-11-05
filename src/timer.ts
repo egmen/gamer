@@ -8,7 +8,7 @@ import {
   makeAutoObservable,
 } from "mobx";
 
-import { play, PlayType } from "./sound";
+import { play, PlayType } from "./sound/playAudio";
 import settings from "./settings";
 
 function playMuted(type: PlayType, isMuted: boolean): void {

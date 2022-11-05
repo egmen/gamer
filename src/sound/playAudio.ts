@@ -1,4 +1,8 @@
-import { PlayType } from ".";
+export enum PlayType {
+  START,
+  FINISH,
+  WARNING,
+}
 
 function getFrequences(type: PlayType): number[] {
   switch (type) {
@@ -7,17 +11,7 @@ function getFrequences(type: PlayType): number[] {
       return [1000, 3000, 5000, 6000, 8000, 10000, 12000, 14000, 16000];
     case PlayType.WARNING:
       return [
-        1000,
-        2000,
-        3000,
-        5000,
-        6000,
-        8000,
-        9000,
-        10000,
-        12000,
-        13000,
-        14000,
+        1000, 2000, 3000, 5000, 6000, 8000, 9000, 10000, 12000, 13000, 14000,
         16000,
       ];
     default:
@@ -50,4 +44,8 @@ export default function playAudio(type: PlayType): void {
   setTimeout(() => {
     audioCtx.close();
   }, 2000);
+}
+
+export function play(type: PlayType) {
+  playAudio(type);
 }
