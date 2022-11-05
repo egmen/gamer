@@ -1,5 +1,4 @@
 /* eslint-disable class-methods-use-this */
-import _ from "lodash";
 import {
   observable,
   action,
@@ -97,7 +96,7 @@ class Timer {
     const moveTime = Number(
       window.prompt("Введите новое значение", String(settings.moveTime))
     );
-    if (moveTime && _.isNumber(moveTime)) {
+    if (moveTime && !Number.isNaN(moveTime)) {
       settings.moveTime = moveTime;
     }
   };
@@ -107,7 +106,7 @@ class Timer {
     const warningTime = Number(
       window.prompt("Введите новое значение", String(settings.warningTime))
     );
-    if (warningTime && _.isNumber(warningTime)) {
+    if (warningTime && !Number.isNaN(warningTime)) {
       settings.warningTime = warningTime;
     }
   };

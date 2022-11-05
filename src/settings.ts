@@ -1,4 +1,3 @@
-import _ from "lodash";
 import {
   observable,
   action,
@@ -29,7 +28,11 @@ export class SettingsStore {
           this.firstRun = false;
         }
       }
-      const cleanSettings = _.omit(toJS(this), ["firstRun"]);
+      const cleanSettings = toJS({
+        moveTime: this.moveTime,
+        warningTime: this.warningTime,
+        isMuted: this.isMuted,
+      });
       window.localStorage.setItem("settings", JSON.stringify(cleanSettings));
     });
 
