@@ -11,12 +11,9 @@ if (!rootElement) {
 
 async function wakeLock() {
   if ("wakeLock" in navigator) {
-    // @ts-ignore
-    await navigator.wakeLock.request("screen");
+    await (navigator as any).wakeLock.request("screen");
   }
 }
-
-wakeLock();
 
 const root = ReactDOM.createRoot(rootElement);
 
@@ -25,3 +22,5 @@ root.render(
     <Timer />
   </App>
 );
+
+wakeLock();
