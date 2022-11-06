@@ -8,7 +8,7 @@ import {
 } from "mobx";
 
 export class SettingsStore {
-  moveTime = 40;
+  moveTime = 60;
 
   warningTime = 10;
 
