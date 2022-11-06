@@ -11,7 +11,7 @@ if (!rootElement) {
 
 async function wakeLock() {
   if ("wakeLock" in navigator) {
-    await (navigator as any).wakeLock.request("screen");
+    await navigator.wakeLock.request("screen");
   }
 }
 
