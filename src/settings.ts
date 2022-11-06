@@ -17,6 +17,13 @@ export class SettingsStore {
   private firstRun = true;
 
   constructor() {
+    makeAutoObservable(this, {
+      moveTime: observable,
+      warningTime: observable,
+      isMuted: observable,
+      clear: action,
+    });
+
     // Загрузка настроек из localStorage
     autorun(() => {
       if (this.firstRun) {
@@ -34,13 +41,6 @@ export class SettingsStore {
         isMuted: this.isMuted,
       });
       window.localStorage.setItem("settings", JSON.stringify(cleanSettings));
-    });
-
-    makeAutoObservable(this, {
-      moveTime: observable,
-      warningTime: observable,
-      isMuted: observable,
-      clear: action,
     });
   }
 

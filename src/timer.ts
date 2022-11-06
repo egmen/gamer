@@ -27,6 +27,21 @@ class Timer {
   timerId = 0;
 
   constructor() {
+    makeAutoObservable(this, {
+      isActive: observable,
+      currentTime: observable,
+      timerId: observable,
+      isStartTime: computed,
+      isWarningTime: computed,
+      isFinishTime: computed,
+      handleClick: action,
+      className: computed,
+      timeLeft: computed,
+      handleChangeWarning: action,
+      handleChangeMoveTime: action,
+      handleToggleMuted: action,
+    });
+
     autorun(() => {
       if (this.currentTime >= settings.moveTime) {
         this.isActive = false;
@@ -41,21 +56,6 @@ class Timer {
         clearTimeout(this.timerId);
         this.timerId = 0;
       }
-    });
-
-    makeAutoObservable(this, {
-      isActive: observable,
-      currentTime: observable,
-      timerId: observable,
-      isStartTime: computed,
-      isWarningTime: computed,
-      isFinishTime: computed,
-      handleClick: action,
-      className: computed,
-      timeLeft: computed,
-      handleChangeWarning: action,
-      handleChangeMoveTime: action,
-      handleToggleMuted: action,
     });
   }
 
