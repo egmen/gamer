@@ -11,14 +11,3 @@
 ⚪ **Опционально:**
 - `react` / `react-dom` 18 → 19 (+ `@types/react`, `@types/react-dom`).
 - `typescript` 5.9 → 6.0 (вместе с typescript-eslint, после проверки совместимости).
-
-## Иконки приложения
-
-Разобраться с иконками — сейчас это дефолтные ассеты от Create React App:
-- `public/favicon.ico`, `public/logo192.png`, `public/logo512.png` — заменить на
-  настоящие иконки таймера (фавиконка + PWA + apple-touch-icon).
-- `public/manifest.json` — цвета от старой светлой темы, привести к тёмной:
-  `theme_color` `#000000` → `#0a0c0f`, `background_color` `#ffffff` → `#0a0c0f`.
-  (В `index.html` `theme-color` уже `#0a0c0f` — синхронизировать.)
-- Проверить размеры/назначение: maskable-иконка для Android, корректный
-  `apple-touch-icon` (180×180).
