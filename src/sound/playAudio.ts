@@ -4,7 +4,7 @@ export enum PlayType {
   WARNING,
 }
 
-function getFrequences(type: PlayType): number[] {
+function getFrequencies(type: PlayType): number[] {
   switch (type) {
     case PlayType.START:
     case PlayType.FINISH:
@@ -20,7 +20,7 @@ function getFrequences(type: PlayType): number[] {
 }
 
 export default function playAudio(type: PlayType): void {
-  const freq = getFrequences(type);
+  const freq = getFrequencies(type);
   const SOUND_DURATION = 1.1;
   const FADE_DURATION = 0.05;
   const audioCtx = new window.AudioContext();

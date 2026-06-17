@@ -1,8 +1,16 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 
-// https://vitejs.dev/config/
+// base: "./" — относительные пути к ассетам, чтобы сборка работала
+// на GitHub Pages из подкаталога /<repo>/ без знания имени репозитория.
 export default defineConfig({
+  base: "./",
   plugins: [react()],
-  base: "",
+  server: {
+    port: 3000,
+    open: true,
+  },
+  build: {
+    outDir: "build",
+  },
 });
