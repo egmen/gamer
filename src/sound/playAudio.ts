@@ -1,3 +1,5 @@
+import settings from "../settings";
+
 export enum PlayType {
   START,
   FINISH,
@@ -5,6 +7,22 @@ export enum PlayType {
 }
 
 /**
+ * Доступные наборы звуков:
+ * - `chgk`     — синтез гармоник из `CHGK_SOUNDS` (тоны «Что? Где? Когда?»), по умолчанию;
+ * - `standard` — простые бипы (набор из исходного дизайна);
+ * - `off`      — звук отключён.
+ */
+export type SoundSet = "standard" | "chgk" | "off";
+
+export const SOUND_SETS: { key: SoundSet; name: string }[] = [
+  { key: "standard", name: "Стандарт" },
+  { key: "chgk", name: "ЧГК" },
+  { key: "off", name: "Выкл" },
+];
+
+/**
+ * Набор «ЧГК» — синтез через Web Audio API (без аудиофайлов).
+ *
  * Спектр каждого звука снят с исходных mp3 (анализ через DFT/Goertzel):
  * это стабильные по высоте гармонические тоны. Воспроизводим их через
  * OscillatorNode с кастомным PeriodicWave (амплитуды гармоник) и
@@ -20,7 +38,7 @@ interface SoundSpec {
   duration: number;
 }
 
-const SOUNDS: Record<PlayType, SoundSpec> = {
+const CHGK_SOUNDS: Record<PlayType, SoundSpec> = {
   // f0 = 1024 Гц, доминируют нечётные гармоники (близко к меандру).
   [PlayType.START]: {
     fundamental: 1024,
@@ -56,8 +74,8 @@ function buildWave(ctx: AudioContext, partials: number[]): PeriodicWave {
   return ctx.createPeriodicWave(real, imag, { disableNormalization: false });
 }
 
-export default function playAudio(type: PlayType): void {
-  const spec = SOUNDS[type];
+function playChgk(type: PlayType): void {
+  const spec = CHGK_SOUNDS[type];
   if (!spec) {
     throw new Error(`Unexpected type: ${type}`);
   }
@@ -84,6 +102,91 @@ export default function playAudio(type: PlayType): void {
   };
 }
 
-export function play(type: PlayType) {
+/**
+ * Набор «Стандарт» — простые бипы из исходного дизайна. Используют один общий
+ * AudioContext (переиспользуется между сигналами), его нужно «разбудить»
+ * пользовательским жестом — см. unlockSounds().
+ */
+let standardCtx: AudioContext | null = null;
+
+function standardContext(): AudioContext {
+  if (!standardCtx) {
+    const Ctor =
+      window.AudioContext ||
+      (window as unknown as { webkitAudioContext: typeof AudioContext })
+        .webkitAudioContext;
+    standardCtx = new Ctor();
+  }
+  return standardCtx;
+}
+
+function beep(
+  freq: number,
+  dur: number,
+  type: OscillatorType,
+  when = 0,
+  gain = 0.32
+): void {
+  const ac = standardContext();
+  if (ac.state === "suspended") {
+    ac.resume();
+  }
+  const t = ac.currentTime + when;
+  const o = ac.createOscillator();
+  const g = ac.createGain();
+  o.type = type;
+  o.frequency.value = freq;
+  o.connect(g);
+  g.connect(ac.destination);
+  g.gain.setValueAtTime(0.0001, t);
+  g.gain.exponentialRampToValueAtTime(gain, t + 0.012);
+  g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+  o.start(t);
+  o.stop(t + dur + 0.03);
+}
+
+const STANDARD: Record<PlayType, () => void> = {
+  [PlayType.START]: () => {
+    beep(587, 0.12, "sine", 0);
+    beep(880, 0.16, "sine", 0.13);
+  },
+  [PlayType.WARNING]: () => {
+    beep(740, 0.14, "square", 0);
+    beep(740, 0.14, "square", 0.2);
+  },
+  [PlayType.FINISH]: () => {
+    beep(196, 0.5, "sawtooth", 0);
+    beep(165, 0.6, "sawtooth", 0.18);
+  },
+};
+
+function playStandard(type: PlayType): void {
+  STANDARD[type]();
+}
+
+/**
+ * Снимает блокировку автозапуска: вызывается из обработчика пользовательского
+ * жеста (тапа), чтобы отложенные сигналы набора «Стандарт» (предупреждение,
+ * финиш) могли проиграться без участия пользователя — важно для iOS/мобильных.
+ */
+export function unlockSounds(): void {
+  const ac = standardContext();
+  if (ac.state === "suspended") {
+    ac.resume();
+  }
+}
+
+export default function playAudio(type: PlayType): void {
+  if (settings.soundSet === "off") {
+    return;
+  }
+  if (settings.soundSet === "standard") {
+    playStandard(type);
+  } else {
+    playChgk(type);
+  }
+}
+
+export function play(type: PlayType): void {
   playAudio(type);
 }

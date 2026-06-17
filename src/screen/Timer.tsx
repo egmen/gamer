@@ -1,57 +1,89 @@
 import React from "react";
 import { observer } from "mobx-react";
-import classNames from "classnames";
 
 import timer from "../timer";
 import settings from "../settings";
+import { THEMES } from "../themes";
+import { getOverlay } from "./view";
+import DotRing from "./components/DotRing";
+import SettingsSheet from "./components/SettingsSheet";
 
 function Timer(): JSX.Element {
+  const theme = THEMES[settings.theme];
+  const overlay = getOverlay(timer.bg, theme);
+
   return (
     <div
       role="button"
       tabIndex={0}
-      className={classNames({
-        timer: true,
-        start: timer.isStartTime,
-        warning: timer.isWarningTime,
-        finish: timer.isFinishTime,
-      })}
-      onClick={timer.handleClick}
-      onKeyPress={timer.handleClick}
+      onClick={timer.restart}
+      onKeyPress={timer.restart}
+      style={{
+        position: "fixed",
+        inset: 0,
+        overflow: "hidden",
+        background: theme.bg,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        fontFamily: "'JetBrains Mono',ui-monospace,monospace",
+        cursor: "pointer",
+        WebkitUserSelect: "none",
+        userSelect: "none",
+        WebkitTapHighlightColor: "transparent",
+      }}
     >
-      <h1>Время срабатывания таймера</h1>
-      <p>
-        Время хода:
-        {settings.moveTime}
-        <button type="button" onClick={timer.handleChangeMoveTime}>
-          Изменить
+      {/* Заливка-вспышка фона (старт / предупреждение / финиш). */}
+      <div
+        style={{
+          position: "absolute",
+          inset: 0,
+          pointerEvents: "none",
+          zIndex: 1,
+          background: `radial-gradient(circle at 50% 42%, ${overlay.color} 0%, transparent ${overlay.stop})`,
+          opacity: overlay.opacity,
+          transition: "opacity .55s ease",
+          animation: overlay.anim,
+        }}
+      />
+
+      <div
+        style={{
+          position: "absolute",
+          top: 20,
+          left: 0,
+          right: 0,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "flex-end",
+          padding: "0 22px",
+          zIndex: 6,
+        }}
+      >
+        <button
+          type="button"
+          onClick={timer.openSettings}
+          style={{
+            appearance: "none",
+            border: "1px solid rgba(255,255,255,.16)",
+            background: "rgba(255,255,255,.04)",
+            color: "rgba(255,255,255,.6)",
+            fontFamily: "inherit",
+            fontSize: 10,
+            fontWeight: 500,
+            letterSpacing: 2,
+            padding: "7px 12px",
+            borderRadius: 999,
+            cursor: "pointer",
+          }}
+        >
+          МЕНЮ
         </button>
-      </p>
-      <p>
-        Время предупреждения:
-        {settings.warningTime}
-        <button type="button" onClick={timer.handleChangeWarning}>
-          Изменить
-        </button>
-      </p>
-      <p>
-        <button type="button" onClick={timer.handleClearSettings}>
-          По-умолчанию
-        </button>
-      </p>
-      <p>
-        <button type="button" onClick={timer.handleToggleMuted}>
-          {settings.isMuted ? "🔈" : "🔊"}
-        </button>
-      </p>
-      <h1>
-        {timer.currentTime}
-        <br />
-        {timer.className}
-        <br />
-      </h1>
-      <h1>Осталось:</h1>
-      <p className="left">{timer.timeLeft}</p>
+      </div>
+
+      <DotRing />
+
+      {timer.settingsOpen && <SettingsSheet />}
     </div>
   );
 }

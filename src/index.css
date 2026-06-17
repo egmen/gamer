@@ -1,32 +1,29 @@
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+
 body {
-  margin: 0px;
-  padding: 0px;
+  background: #0a0c0f;
+  color: #eef2f5;
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  overscroll-behavior: none;
 }
-.main {
-  display: grid;
-  grid-template-columns: auto;
-  grid-template-rows: auto;
-}
-.timer {
-  background-color: grey;
-  height: 100vh;
-}
-.start {
-  background-color: white;
-  transition: 500ms;
-}
-.warning {
-  background-color: yellow;
-  transition: 500ms;
-}
-.finish {
-  background-color: greenyellow;
-  transition: 500ms;
-}
-h1 {
-  margin-top: 0;
-}
-.left {
-  font-size: 80px;
-  font-weight: bold;
+
+/* Пульсация подсветки фона в момент предупреждения. */
+@keyframes gtWarnPulse {
+  0%,
+  100% {
+    opacity: 0.2;
+  }
+  50% {
+    opacity: 0.46;
+  }
 }

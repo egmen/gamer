@@ -7,12 +7,17 @@ import {
   makeAutoObservable,
 } from "mobx";
 
+import type { ThemeKey } from "./themes";
+import type { SoundSet } from "./sound/playAudio";
+
 export class SettingsStore {
   moveTime = 60;
 
   warningTime = 10;
 
-  isMuted = false;
+  theme: ThemeKey = "midnight";
+
+  soundSet: SoundSet = "chgk";
 
   private firstRun = true;
 
@@ -20,7 +25,8 @@ export class SettingsStore {
     makeAutoObservable(this, {
       moveTime: observable,
       warningTime: observable,
-      isMuted: observable,
+      theme: observable,
+      soundSet: observable,
       clear: action,
     });
 
@@ -30,6 +36,11 @@ export class SettingsStore {
         const store = window.localStorage.getItem("settings") || "{}";
         try {
           const settings = JSON.parse(store);
+          // Миграция со старого булева isMuted на набор звуков.
+          if (settings && settings.soundSet === undefined && settings.isMuted) {
+            settings.soundSet = "off";
+          }
+          delete settings.isMuted;
           set(this, settings);
         } finally {
           this.firstRun = false;
@@ -38,7 +49,8 @@ export class SettingsStore {
       const cleanSettings = toJS({
         moveTime: this.moveTime,
         warningTime: this.warningTime,
-        isMuted: this.isMuted,
+        theme: this.theme,
+        soundSet: this.soundSet,
       });
       window.localStorage.setItem("settings", JSON.stringify(cleanSettings));
     });
