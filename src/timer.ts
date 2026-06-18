@@ -1,4 +1,3 @@
-/* eslint-disable class-methods-use-this */
 import { makeAutoObservable } from "mobx";
 
 import { play, unlockSounds, PlayType, SoundSet } from "./sound/playAudio";
@@ -131,7 +130,7 @@ class Timer {
     settings.warningTime = clamp(
       settings.warningTime + delta,
       3,
-      Math.min(60, settings.moveTime - 2)
+      Math.min(60, settings.moveTime - 2),
     );
   }
 

@@ -24,7 +24,7 @@ function Stepper({
   onDecrement,
   onIncrement,
   divider,
-}: StepperProps): JSX.Element {
+}: StepperProps): React.JSX.Element {
   const btn = stepBtn(theme);
   return (
     <div

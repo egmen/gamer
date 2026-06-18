@@ -15,7 +15,7 @@ const root = ReactDOM.createRoot(rootElement);
 root.render(
   <App>
     <Timer />
-  </App>
+  </App>,
 );
 
 enableWakeLock();

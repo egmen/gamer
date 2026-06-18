@@ -15,7 +15,7 @@ export function buildDots(
   theme: Theme,
   total: number,
   warningTime: number,
-  elapsedSec: number
+  elapsedSec: number,
 ): Dot[] {
   const warnStart = total - warningTime;
   const dotSize = Math.max(4, Math.min(11, Math.round(760 / total)));
@@ -48,7 +48,7 @@ export function buildDots(
     }
 
     const transform = `translate(-50%,-50%) translate(${x.toFixed(
-      2
+      2,
     )}px,${y.toFixed(2)}px)`;
 
     dots.push({
@@ -83,7 +83,7 @@ export function getHint(
   bg: BgFlash,
   timeLeft: number,
   warningTime: number,
-  theme: Theme
+  theme: Theme,
 ): Hint {
   if (phase === "running") {
     if (bg === "warn" || timeLeft <= warningTime) {

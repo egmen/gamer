@@ -1,4 +1,3 @@
-/* eslint-disable jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions */
 import React from "react";
 import { observer } from "mobx-react";
 
@@ -10,7 +9,7 @@ import Stepper from "./Stepper";
 import SegmentedControl, { SegmentOption } from "./SegmentedControl";
 
 /** Выезжающая снизу панель настроек. */
-function SettingsSheet(): JSX.Element {
+function SettingsSheet(): React.JSX.Element {
   const theme = THEMES[settings.theme];
 
   const themeOptions: SegmentOption<ThemeKey>[] = THEME_LIST.map((key) => ({
@@ -89,7 +88,7 @@ function SettingsSheet(): JSX.Element {
         <Stepper
           theme={theme}
           label="Время хода"
-          hint={`${settings.moveTime} сек · ${settings.moveTime} точек`}
+          hint={`${settings.moveTime} сек`}
           value={`${settings.moveTime}с`}
           onDecrement={() => timer.stepMove(-5)}
           onIncrement={() => timer.stepMove(5)}

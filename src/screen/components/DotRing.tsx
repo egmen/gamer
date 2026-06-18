@@ -7,7 +7,7 @@ import { THEMES } from "../../themes";
 import { buildDots, getHint } from "../view";
 
 /** Кольцо точек с центральным счётчиком секунд и статусом. */
-function DotRing(): JSX.Element {
+function DotRing(): React.JSX.Element {
   const theme = THEMES[settings.theme];
   const total = settings.moveTime;
   const elapsedSec = timer.phase === "finished" ? total : timer.elapsedSec;
@@ -18,7 +18,7 @@ function DotRing(): JSX.Element {
     timer.bg,
     timer.timeLeft,
     settings.warningTime,
-    theme
+    theme,
   );
 
   return (

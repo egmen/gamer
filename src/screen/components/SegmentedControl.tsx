@@ -28,7 +28,7 @@ function SegmentedControl<T extends string>({
   value,
   onPick,
   divider,
-}: SegmentedControlProps<T>): JSX.Element {
+}: SegmentedControlProps<T>): React.JSX.Element {
   return (
     <div
       style={{

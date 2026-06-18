@@ -125,7 +125,7 @@ function beep(
   dur: number,
   type: OscillatorType,
   when = 0,
-  gain = 0.32
+  gain = 0.32,
 ): void {
   const ac = standardContext();
   if (ac.state === "suspended") {

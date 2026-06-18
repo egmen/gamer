@@ -8,7 +8,7 @@ import { getOverlay } from "./view";
 import DotRing from "./components/DotRing";
 import SettingsSheet from "./components/SettingsSheet";
 
-function Timer(): JSX.Element {
+function Timer(): React.JSX.Element {
   const theme = THEMES[settings.theme];
   const overlay = getOverlay(timer.bg, theme);
 
