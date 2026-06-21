@@ -1,66 +1,65 @@
-import {
-  observable,
-  action,
-  autorun,
-  toJS,
-  set,
-  makeAutoObservable,
-} from "mobx";
+import { notify } from "./store";
 
 import type { ThemeKey } from "./themes";
 import type { SoundSet } from "./sound/playAudio";
 
-export class SettingsStore {
-  moveTime = 60;
-
-  warningTime = 10;
-
-  theme: ThemeKey = "midnight";
-
-  soundSet: SoundSet = "chgk";
-
-  private firstRun = true;
-
-  constructor() {
-    makeAutoObservable(this, {
-      moveTime: observable,
-      warningTime: observable,
-      theme: observable,
-      soundSet: observable,
-      clear: action,
-    });
-
-    // Загрузка настроек из localStorage
-    autorun(() => {
-      if (this.firstRun) {
-        const store = window.localStorage.getItem("settings") || "{}";
-        try {
-          const settings = JSON.parse(store);
-          // Миграция со старого булева isMuted на набор звуков.
-          if (settings && settings.soundSet === undefined && settings.isMuted) {
-            settings.soundSet = "off";
-          }
-          delete settings.isMuted;
-          set(this, settings);
-        } finally {
-          this.firstRun = false;
-        }
-      }
-      const cleanSettings = toJS({
-        moveTime: this.moveTime,
-        warningTime: this.warningTime,
-        theme: this.theme,
-        soundSet: this.soundSet,
-      });
-      window.localStorage.setItem("settings", JSON.stringify(cleanSettings));
-    });
-  }
-
-  public clear = (): void => {
-    delete window.localStorage.settings;
-    Object.assign(this, {});
-    window.location.reload();
-  };
+export interface Settings {
+  moveTime: number;
+  warningTime: number;
+  theme: ThemeKey;
+  soundSet: SoundSet;
 }
 
-export default new SettingsStore();
+const DEFAULTS: Settings = {
+  moveTime: 60,
+  warningTime: 10,
+  theme: "midnight",
+  soundSet: "chgk",
+};
+
+/** Читает настройки из localStorage, дополняя значениями по умолчанию. */
+function load(): Settings {
+  const result: Settings = { ...DEFAULTS };
+  try {
+    const stored = JSON.parse(window.localStorage.getItem("settings") || "{}");
+    if (stored && typeof stored === "object") {
+      // Миграция со старого булева isMuted на набор звуков.
+      if (stored.soundSet === undefined && stored.isMuted) {
+        stored.soundSet = "off";
+      }
+      delete stored.isMuted;
+      Object.assign(result, stored);
+    }
+  } catch {
+    // повреждённый JSON — остаёмся на значениях по умолчанию
+  }
+  return result;
+}
+
+function persist(s: Settings): void {
+  window.localStorage.setItem(
+    "settings",
+    JSON.stringify({
+      moveTime: s.moveTime,
+      warningTime: s.warningTime,
+      theme: s.theme,
+      soundSet: s.soundSet,
+    }),
+  );
+}
+
+const state = load();
+persist(state);
+
+// Прокси заменяет mobx observable + autorun: любое присваивание поля
+// сохраняет настройки в localStorage и уведомляет UI о перерисовке.
+const settings = new Proxy(state, {
+  set(target, key, value) {
+    Reflect.set(target, key, value);
+    persist(target);
+    notify();
+    return true;
+  },
+});
+
+export default settings;

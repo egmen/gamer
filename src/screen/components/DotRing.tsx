@@ -1,6 +1,6 @@
 import React from "react";
-import { observer } from "mobx-react";
 
+import { useStore } from "../../store";
 import timer from "../../timer";
 import settings from "../../settings";
 import { THEMES } from "../../themes";
@@ -8,6 +8,7 @@ import { buildDots, getHint } from "../view";
 
 /** Кольцо точек с центральным счётчиком секунд и статусом. */
 function DotRing(): React.JSX.Element {
+  useStore();
   const theme = THEMES[settings.theme];
   const total = settings.moveTime;
   const elapsedSec = timer.phase === "finished" ? total : timer.elapsedSec;
@@ -74,4 +75,4 @@ function DotRing(): React.JSX.Element {
   );
 }
 
-export default observer(DotRing);
+export default DotRing;

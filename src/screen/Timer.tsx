@@ -1,6 +1,6 @@
 import React from "react";
-import { observer } from "mobx-react";
 
+import { useStore } from "../store";
 import timer from "../timer";
 import settings from "../settings";
 import { THEMES } from "../themes";
@@ -9,6 +9,7 @@ import DotRing from "./components/DotRing";
 import SettingsSheet from "./components/SettingsSheet";
 
 function Timer(): React.JSX.Element {
+  useStore();
   const theme = THEMES[settings.theme];
   const overlay = getOverlay(timer.bg, theme);
 
@@ -88,4 +89,4 @@ function Timer(): React.JSX.Element {
   );
 }
 
-export default observer(Timer);
+export default Timer;

@@ -1,5 +1,4 @@
-import { makeAutoObservable } from "mobx";
-
+import { notify } from "./store";
 import { play, unlockSounds, PlayType, SoundSet } from "./sound/playAudio";
 import settings from "./settings";
 import { ThemeKey } from "./themes";
@@ -17,6 +16,10 @@ function clamp(value: number, lo: number, hi: number): number {
   return Math.max(lo, Math.min(hi, Math.round(value)));
 }
 
+// Методы — стрелочные поля класса, чтобы их можно было передавать как
+// обработчики (onClick={timer.restart}) без потери `this`. Каждое изменение
+// состояния завершается notify() — это перерисовывает подписанные компоненты
+// (раньше за это отвечал mobx).
 class Timer {
   phase: Phase = "idle";
 
@@ -32,10 +35,6 @@ class Timer {
   private flashTimeoutId = 0;
 
   private warned = false;
-
-  constructor() {
-    makeAutoObservable(this, {}, { autoBind: true });
-  }
 
   /** Сколько секунд осталось до конца хода. */
   get timeLeft(): number {
@@ -61,14 +60,15 @@ class Timer {
     }
   }
 
-  private clearFlash(): void {
+  private clearFlash = (): void => {
     // На финише фон загорается и держится до следующего старта.
     if (this.phase !== "finished") {
       this.bg = "none";
+      notify();
     }
-  }
+  };
 
-  private tick(): void {
+  private tick = (): void => {
     this.elapsedSec += 1;
     const remaining = settings.moveTime - this.elapsedSec;
     if (!this.warned && remaining <= settings.warningTime && remaining > 0) {
@@ -83,10 +83,11 @@ class Timer {
       this.bg = "finish";
       this.playSound(PlayType.FINISH);
     }
-  }
+    notify();
+  };
 
   /** Тап в любом месте экрана — запуск/перезапуск хода с начала. */
-  restart(): void {
+  restart = (): void => {
     unlockSounds();
     enableWakeLock();
     clearInterval(this.intervalId);
@@ -97,26 +98,29 @@ class Timer {
     this.playSound(PlayType.START);
     this.flash("start");
     this.intervalId = window.setInterval(this.tick, 1000);
-  }
+    notify();
+  };
 
   // --- Обработчики меню (настройки) ---
 
-  openSettings(event: SyntheticEvent): void {
+  openSettings = (event: SyntheticEvent): void => {
     event.stopPropagation();
     this.settingsOpen = true;
-  }
+    notify();
+  };
 
-  closeSettings(event: SyntheticEvent): void {
+  closeSettings = (event: SyntheticEvent): void => {
     event.stopPropagation();
     this.settingsOpen = false;
-  }
+    notify();
+  };
 
   /** Гасит всплытие тапов внутри панели настроек. */
-  stopEvent(event: SyntheticEvent): void {
+  stopEvent = (event: SyntheticEvent): void => {
     event.stopPropagation();
-  }
+  };
 
-  stepMove(delta: number): void {
+  stepMove = (delta: number): void => {
     const value = clamp(settings.moveTime + delta, 10, 180);
     settings.moveTime = value;
     settings.warningTime = Math.min(settings.warningTime, value - 2);
@@ -124,25 +128,27 @@ class Timer {
       this.phase = "idle";
       this.elapsedSec = 0;
     }
-  }
+    notify();
+  };
 
-  stepWarn(delta: number): void {
+  stepWarn = (delta: number): void => {
     settings.warningTime = clamp(
       settings.warningTime + delta,
       3,
       Math.min(60, settings.moveTime - 2),
     );
-  }
+    notify();
+  };
 
-  pickTheme(theme: ThemeKey): void {
+  pickTheme = (theme: ThemeKey): void => {
     settings.theme = theme;
-  }
+  };
 
-  pickSoundSet(soundSet: SoundSet): void {
+  pickSoundSet = (soundSet: SoundSet): void => {
     settings.soundSet = soundSet;
-  }
+  };
 
-  resetDefaults(event: SyntheticEvent): void {
+  resetDefaults = (event: SyntheticEvent): void => {
     event.stopPropagation();
     clearInterval(this.intervalId);
     clearTimeout(this.flashTimeoutId);
@@ -155,7 +161,8 @@ class Timer {
     this.elapsedSec = 0;
     this.bg = "none";
     this.warned = false;
-  }
+    notify();
+  };
 }
 
 export default new Timer();

@@ -1,6 +1,6 @@
 import React from "react";
-import { observer } from "mobx-react";
 
+import { useStore } from "../../store";
 import timer from "../../timer";
 import settings from "../../settings";
 import { THEMES, THEME_LIST, ThemeKey } from "../../themes";
@@ -10,6 +10,7 @@ import SegmentedControl, { SegmentOption } from "./SegmentedControl";
 
 /** Выезжающая снизу панель настроек. */
 function SettingsSheet(): React.JSX.Element {
+  useStore();
   const theme = THEMES[settings.theme];
 
   const themeOptions: SegmentOption<ThemeKey>[] = THEME_LIST.map((key) => ({
@@ -148,4 +149,4 @@ function SettingsSheet(): React.JSX.Element {
   );
 }
 
-export default observer(SettingsSheet);
+export default SettingsSheet;
